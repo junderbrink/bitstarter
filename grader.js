@@ -21,6 +21,7 @@ References:
    - https://developer.mozilla.org/en-US/docs/JSON#JSON_in_Firefox_2
 */
 
+var util = require('util');
 var fs = require('fs');
 var program = require('commander');
 var cheerio = require('cheerio');
@@ -43,6 +44,8 @@ var cheerioHtmlFile = function(htmlfile) {
 };
 
 var cheerioURLresponse = function(response) {
+    console.log("made it 46");
+    //console.log(cheerio.load(response));
     return cheerio.load(response);
 };
 
@@ -51,17 +54,19 @@ var loadChecks = function(checksfile) {
 };
 
 var buildfn = function(checksfile) {
-    var response2console = function(result, response) {
+    var response2console = function(result, response) {        
         if (result instanceof Error) {
             console.error('Error: ' + util.format(response.message));
         } else {
             var checks = loadChecks(checksfile).sort();
             var out = {};
-            console.log("made it");
-            $ = cheerioURLresponse(response);
+
+            $ = cheerio.load(response["rawEncoded"]);
+
             for(var ii in checks) 
             {
                 var present = $(checks[ii]).length > 0;
+
                 out[checks[ii]] = present;
             }
             var outJson = JSON.stringify(out, null, 4);
